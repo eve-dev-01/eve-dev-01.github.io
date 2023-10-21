@@ -38,8 +38,9 @@
                 min-width: 300px;
                 margin-left: 10px;
                 margin-right: 10px;
-                margin-top: auto;
-                margin-bottom: auto;
+                margin-bottom: 10px;
+                margin-top: 10px auto;
+                margin-bottom: 10px auto;
             }
             .text-box-image-box {
                 width:520px;
@@ -83,7 +84,7 @@
             <div class="text-box">
                 <div class="text-box-element">
                     <div class="text-box-image-box">
-                        <img class="text-box-image" src="Images/ep_engine/MeshInput.png">
+                        <img class="text-box-image" src="Images/ep_engine/MeshInput.png" alt="A selection of constant data used in mesh management">
                         </img>
                     </div>
                 </div>
@@ -100,16 +101,31 @@
                 </div>
                 <div class="text-box-element">
                     <div class="text-box-image-box">
-                        <img class="text-box-image" style="object-fit: contain;" src="Images/ep_engine/MeshTextures.png">
+                        <img class="text-box-image" style="object-fit: contain;" src="Images/ep_engine/MeshTextures.png"
+                            alt="The albedo, normal, roughness and metallic maps used by the vending machine model">
                         </img>
                     </div>
                 </div>
             </div>
             <br>
             <div class="text-box">
+                <div class="text-box-element">
+                    <div class="text-box-image-box">
+                        <img class="text-box-image" style="object-fit: contain;" src="Images/ep_engine/AsyncLoad.png"#
+                            alt="The structure used for an asynchronous load (code)">
+                        </img>
+                    </div>
+                </div>
                 <div class="text-box-contents">
                     The loading of resources is delegated to a dedicated loading thread. Loading tasks are submitted in batches to the resource manager, along with callbacks per-object and per-batch. This alleviates the cost of run-time loading if such a need arises. Resources are simply reference counted, 
                     and only deleted when all references are dropped. This allows game code to "release" a resource without worrying about other parts of the application.
+                </div>
+                <div class="text-box-element">
+                    <div class="text-box-image-box">
+                        <img class="text-box-image" style="object-fit: contain;" src="Images/ep_engine/AsyncLoadSend.png"
+                            alt="Setting up parameters for an asynchronous load (code)">
+                        </img>
+                    </div>
                 </div>
             </div>
             <br>
