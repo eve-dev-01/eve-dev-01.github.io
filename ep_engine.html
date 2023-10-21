@@ -12,73 +12,151 @@
             .text-box {
                 margin-left: 10px;
                 margin-right: 10px;
-                border:1.5px solid aqua;
+                margin-bottom: 10px;
+                border:2px solid aqua;
                 border-radius: 5px;
+            
+                font-size:15pt;
+                min-height:150px;
+                min-width: 500px;
+                
+                width:30%;
+                
+                display:flex;
+                flex-wrap: wrap;       
+                flex-direction: row;
+                flex-grow:1;
+                justify-content: center;      
             }
-            .text-box-contents {
+            .text-box-element {
                 padding-left:10px;
                 padding-right: 10px;
                 padding-top: 10px;
                 padding-bottom: 10px;
             }
+            .text-box-contents {
+                min-width: 300px;
+                margin-left: 10px;
+                margin-right: 10px;
+                margin-bottom: 10px;
+                margin-top: 10px auto;
+                margin-bottom: 10px auto;
+            }
+            .text-box-image-box {
+                width:520px;
+                height: 320px;           
+                overflow:hidden;
+                object-fit: cover;
+                border-radius: 2px;
+            }
+            .text-box-image {
+                width:520px;
+                height:320px;
+                object-fit:cover;
+            }
+            .text-boxes-container {
+                display:flex;
+                flex-wrap: wrap;    
+                flex-direction: row;
+                justify-content: stretch;
+            }
         </style>
     </head>
+
+
     <body style="color:lightgrey">
-        <div class="text-box">
-            <div class="text-box-contents">
-                The EP Engine is a lightweight multi-platform framework for efficient app development. Featuring a low-overhead ECS, custom memory systems, physically based rendering, a custom mesh format and the associated data build across three platforms, this has been a labour of love.
-                From its humble beginnings as an application testing different topologies in DirectX 11, the scope has gradually increased, and has been an excellent learning opportunity. If the EP Engine could be summed up in a phrase, it would be <b>everything is worth making once</b>. 
+        <div class="text-boxes-container">
+            <div class="text-box">
+                <div class="text-box-element">
+                    <div class="text-box-contents">
+                        The EP Engine is a lightweight multi-platform framework for efficient app development. Featuring a low-overhead ECS, custom memory systems, physically based rendering, a custom mesh format and the associated data build across three platforms, this has been a labour of love.
+                        From its humble beginnings as an application testing different topologies in DirectX 11, the scope has gradually increased, and has been an excellent learning opportunity. If the EP Engine could be summed up in a phrase, it would be <b>everything is worth making once</b>. 
+                    </div>
+                </div>
+                <div class="text-box-element">
+                    <div class="text-box-image-box">
+                        <img class="text-box-image" src="Images/homepage/FinalOutput.png">
+                        </img>
+                    </div>
+                </div>
             </div>
-        </div>
-        <br>
-        <div class="text-box">
-            <div class="text-box-contents">
-                The EP Mesh format is used to reduce the loading times and memory footprints of 3D geometry. Each mesh stores only the required data per vertex; each mesh has 9 available channels, but the only required channel is the position. Shader-side, a bitset is used to determine which 
-                channels should be considered, allowing shaders to support multiple configurations of mesh without needing multiple pipeline state objects. GPU-side branching cost is negligible with this approach, as each vertex will follow the same control path.
+            <br>
+            <div class="text-box">
+                <div class="text-box-element">
+                    <div class="text-box-image-box">
+                        <img class="text-box-image" src="Images/ep_engine/MeshInput.png" alt="A selection of constant data used in mesh management">
+                        </img>
+                    </div>
+                </div>
+                <div class="text-box-contents">
+                    The EP Mesh format is used to reduce the loading times and memory footprints of 3D geometry. Each mesh stores only the required data per vertex; each mesh has 9 available channels, but the only required channel is the position. Shader-side, a bitset is used to determine which 
+                    channels should be considered, allowing shaders to support multiple configurations of mesh without needing multiple pipeline state objects. GPU-side branching cost is negligible with this approach, as each vertex will follow the same control path.
+                </div>
             </div>
-        </div>
-        <br>
-        <div class="text-box">
-            <div class="text-box-contents">
-                These meshes are used in the physically based rendering model. Based on the Epic Games model, meshes are expected to provide albedo, metallic, roughness, normal and ambient occlusion maps. This allows for complex material appreances at low runtime cost, for a small memory overhead. 
-                If a mesh cannot provide its own textures, defaults are available.
+            <br>
+            <div class="text-box">
+                <div class="text-box-contents">
+                    These meshes are used in the physically based rendering model. Based on the Epic Games model, meshes are expected to provide albedo, metallic, roughness, normal and ambient occlusion maps. This allows for complex material appreances at low runtime cost, for a small memory overhead. 
+                    If a mesh cannot provide its own textures, defaults are available.
+                </div>
+                <div class="text-box-element">
+                    <div class="text-box-image-box">
+                        <img class="text-box-image" style="object-fit: contain;" src="Images/ep_engine/MeshTextures.png"
+                            alt="The albedo, normal, roughness and metallic maps used by the vending machine model">
+                        </img>
+                    </div>
+                </div>
             </div>
-        </div>
-        <br>
-        <div class="text-box">
-            <div class="text-box-contents">
-                The loading of resources is delegated to a dedicated loading thread. Loading tasks are submitted in batches to the resource manager, along with callbacks per-object and per-batch. This alleviates the cost of run-time loading if such a need arises. Resources are simply reference counted, 
-                and only deleted when all references are dropped. This allows game code to "release" a resource without worrying about other parts of the application.
+            <br>
+            <div class="text-box">
+                <div class="text-box-element">
+                    <div class="text-box-image-box">
+                        <img class="text-box-image" style="object-fit: contain;" src="Images/ep_engine/AsyncLoad.png"#
+                            alt="The structure used for an asynchronous load (code)">
+                        </img>
+                    </div>
+                </div>
+                <div class="text-box-contents">
+                    The loading of resources is delegated to a dedicated loading thread. Loading tasks are submitted in batches to the resource manager, along with callbacks per-object and per-batch. This alleviates the cost of run-time loading if such a need arises. Resources are simply reference counted, 
+                    and only deleted when all references are dropped. This allows game code to "release" a resource without worrying about other parts of the application.
+                </div>
+                <div class="text-box-element">
+                    <div class="text-box-image-box">
+                        <img class="text-box-image" style="object-fit: contain;" src="Images/ep_engine/AsyncLoadSend.png"
+                            alt="Setting up parameters for an asynchronous load (code)">
+                        </img>
+                    </div>
+                </div>
             </div>
-        </div>
-        <br>
-        <div class="text-box">
-            <div class="text-box-contents">
-                The engine features a custom memory system. Designed to give full control to the programmer, large virtual address ranges are reserved by client code, from pools of address ranges created at program startup. Within these address ranges, client code can manually map and unmap 
-                memory in multiples of the system page size. This method allows the reservation of a larger address range than is expected to be necessary, but only mapping when the space is needed; in the engine, this is used in the per-thread scratch (frame) allocator. To support this,
-                custom allocators have been written, and replacements for some STL containers provided, to properly use the system.<br>
-                The system is explained in more detail in <b><u><a href="Documentation/EP_Memory.html" style="color:white;">the documentation here</a></u></b>.
+            <br>
+            <div class="text-box">
+                <div class="text-box-contents">
+                    The engine features a custom memory system. Designed to give full control to the programmer, large virtual address ranges are reserved by client code, from pools of address ranges created at program startup. Within these address ranges, client code can manually map and unmap 
+                    memory in multiples of the system page size. This method allows the reservation of a larger address range than is expected to be necessary, but only mapping when the space is needed; in the engine, this is used in the per-thread scratch (frame) allocator. To support this,
+                    custom allocators have been written, and replacements for some STL containers provided, to properly use the system.<br>
+                    The system is explained in more detail in <b><u><a href="Documentation/EP_Memory.html" style="color:white;">the documentation here</a></u></b>.
+                </div>
             </div>
-        </div>
-        <br>
-        <div class="text-box">
-            <div class="text-box-contents">
-                Supporting 3 platforms has been the primary challenge of the project; cross platform development has been an entirely self taught endeavour. Premake5 is used to generate vcxproj files per-platform, each only including cpp files of the corresponding platform. For some objects, such as the EP_RenderContext,
-                a common implementation needs to exist, and in this case, the common implementation has a platform implementation as a member (e.g. EP_RenderContext_Platform). Using environment variables and the dedicated EP_PLATFORM_HEADER macro, only the platform-specific headers are included. The renderer, input systems, shaders, 
-                virtual memory interface, and much more has all required platform specific work. Using the macro to generate include paths has proved a very effective tool.
+            <br>
+            <div class="text-box">
+                <div class="text-box-contents">
+                    Supporting 3 platforms has been the primary challenge of the project; cross platform development has been an entirely self taught endeavour. Premake5 is used to generate vcxproj files per-platform, each only including cpp files of the corresponding platform. For some objects, such as the EP_RenderContext,
+                    a common implementation needs to exist, and in this case, the common implementation has a platform implementation as a member (e.g. EP_RenderContext_Platform). Using environment variables and the dedicated EP_PLATFORM_HEADER macro, only the platform-specific headers are included. The renderer, input systems, shaders, 
+                    virtual memory interface, and much more has all required platform specific work. Using the macro to generate include paths has proved a very effective tool.
+                </div>
             </div>
-        </div>
-        <br>
-        <div class="text-box">
-            <div class="text-box-contents">
-                As different platforms use different data formats, from DDS to wchar, a dedicated data build is required. This program uses assimp to handle model loading and interpretation. The build runs from an XML definition file, which for each asset defines a source path (where the asset is), a destination path (the path the final program should use to access it), and a unique string key.
-                From this, source assets are converted to platform- or engine-specific formats, and a data manifest is created, which links the hashes of these string keys to the destination path, allowing game code to very simply reference assets. Asset packages are a simple list of string keys, that are used to load a group of assets with a single call. 
+            <br>
+            <div class="text-box">
+                <div class="text-box-contents">
+                    As different platforms use different data formats, from DDS to wchar, a dedicated data build is required. This program uses assimp to handle model loading and interpretation. The build runs from an XML definition file, which for each asset defines a source path (where the asset is), a destination path (the path the final program should use to access it), and a unique string key.
+                    From this, source assets are converted to platform- or engine-specific formats, and a data manifest is created, which links the hashes of these string keys to the destination path, allowing game code to very simply reference assets. Asset packages are a simple list of string keys, that are used to load a group of assets with a single call. 
+                </div>
             </div>
-        </div>
-        <br>
-        <div class="text-box">
-            <div class="text-box-contents">
-                Other features not deserving of their own sections include a custom random implementation (Mersenne twister), graphics resource managers, a safe-shut system for graphics resources, custom sprite batch and font rendering, a basic XML-driven UI system, texture array support, and an input events system. 
+            <br>
+            <div class="text-box">
+                <div class="text-box-contents">
+                    Other features not deserving of their own sections include a custom random implementation (Mersenne twister), graphics resource managers, a safe-shut system for graphics resources, custom sprite batch and font rendering, a basic XML-driven UI system, texture array support, and an input events system. 
+                </div>
             </div>
         </div>
     </body>
