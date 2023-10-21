@@ -1,0 +1,268 @@
+<DOCTYPE! html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>E Powell: EP Memory</title>
+    <meta name="description" content="Documentation for memory management in the EP framework">
+    <meta name="keywords" content="memory">
+    <meta name="author" content="Eve Powell">
+	
+	<style>
+	#container {
+		position:relative;
+		min-height:100vh;
+	}
+	#documentPage {
+		width:90%;
+		min-height:90vh;
+		padding:0px 5% 30px 5%;
+		
+		font-size:12px;
+		background-color:#6EB5FF;
+		opacity:90%;
+		display:flex;
+		justify-content:center;
+	}
+	#document {
+		opacity:100%;
+		width:540px;
+		padding:30px;
+		background-color:white;
+		color:black;
+		font-family:Arial, Helvetica, sans-serif;
+	}
+	#documentTitle {
+		display:inline-block;
+		width:520px;
+		font-size:20px;
+		height:20px;
+		padding:10px;
+		font-weight:bold;
+		color:cornflowerblue;
+	}
+	.cvHeader {
+		font-size:13px;
+		color:cornflowerblue;
+		font-weight:bold;
+	}
+	.cvSubHeader {
+		font-size:12px;
+		color:black;
+		font-weight:bold;
+	}
+	.code {
+		margin-left:15px;
+		margin-right:15px;
+		padding:4px;
+		padding-left:4%;
+		padding-right:4%;
+		background-color: rgb(121, 114, 114);
+		color:white;
+		font-family: 'Courier New', Courier, monospace;
+	}
+	.inlineCode {
+		padding-left: 2px;
+		padding-right:2px;
+		background-color: rgb(121, 114, 114);
+		color:white;
+		font-family: 'Courier New', Courier, monospace;
+	}
+	</style>
+</head>
+
+
+<body>
+    <div id="container">
+
+        <div id="documentPage">
+            <div id="document">
+                <h1 id="documentTitle">EP Memory</h1>
+                <br>
+
+                <h2 class = "cvHeader">Virtual Memory</h2>
+                <p>
+                    The EP Framework utilises virtual memory to service the overwhelming majority of dynamic allocations. Accessing virtual memory can have some overhead, 
+                    but increasingly this is getting smaller, and many chips will use virtual memory by default. Regardless, there are many benefits of virtualising memory, including
+                    potential for reduced memory fragmentation and the ability to separate reservation and mapping of address space.
+                </p>
+                <p>
+                    Even if it had been implemented with traditional addressing, there is benefit to creating a custom memory system. We can have allocation tracking,
+                    which helps track down leaks, and can help manage memory budgets. We can wrap up specific CPU and GPU mapping options for platforms with unified memory,
+                    such as modern consoles. We can also reduce the average allocation time by pooling pre-mapped memory blocks, cutting down on the number of system calls.  
+                </p>
+
+                <h2 class = "cvHeader">Allocation Strategies</h2>
+                <p>
+                    At program startup, a large virtual address space is reserved. A <span class="inlineCode">mem_initializer</span> helper class in the EP_Memory.h file holds a static counter that is incremented
+                    each time the object is constructed; the first time the counter is incremented, the memory system is initialized. At program end, the destructors of these static objects
+                    decrement the counter; once the counter reaches zero, the memory system is closed. This resolves the static-initialization fiasco for the memory system, and will cause
+                    some overhead with static objects being left around, but each is only 4 bytes, so this isn't a huge hit. This ensures that the memory system can be considered a global resource
+                    for the entire lifetime of the program. 
+                </p>
+                <p>
+                    The framework reserves 944GiB of virtual address space, and caches the start and end point of this space. The space is then divided between a number of small pools and large pools.
+                </p>
+                <p>
+                    Small pools aim to reduce the number of system calls by pre-mapping 64KiB memory pages divided into pre-determined block sizes. Small pools are not directly exposed to the user.
+                    Each pool is assigned 32MiB of virtual address space, and assigned a block size; the smallest block size is 8B, with each pool's block size incrementing by 8B until reaching the 
+                    maximum size of a small pool block, 4KiB. This leaves us with 512 small pools in total. <br>
+                    To begin with, we map a 64KiB page from the start of each pool's address space. To divide it into blocks of the desired size, we use an intrusive linked list. As the framework
+                    is designed to work in 64 bit systems, the first 8B of each block act as a pointer to the start of the next block. This allows quick and easy allocation from a pool, as it acts as 
+                    an intrusive singly-linked list. We don't use a standard container to represent this to keep time and memory costs low.<br>
+                    If ever a small pool needs to allocate a block and finds there are none free, another 64KiB page is mapped for the address space directly following the previously mapped page. The new
+                    page is then populated with linked list pointers in the same way as the initial page would be. This can be somewhat time consuming, but is infrequent. Small pool memory is not unmapped
+                    until program end, so eventually a "high watermark" forms, taking full advantage of the quick allocations from the linked list, without the cost of remapping pages. <br>     
+                    Small pool memory is mapped as CPU read-write.
+                </p>
+                <p>
+                    Large pools expose the concept of separation of address space reservation and mapping. Large pools are divided into blocks of sizes between 64KiB and 32GiB, with block sizes doubling 
+                    between pools. Each pool is also given an address space that does not increase in a standard fashion; the full list of large pool reserved address spaces can be found in EP_VMemory.cpp.
+                    For example, the 64KiB pool is given 2GiB of address space. The free state of each block is represented by a bitfield in each pool. <br>
+                    Unlike memory allocated by small pools, the memory allocated by large pools is unmapped, and the mapping must be controlled by the user. Reserved space can be mapped in 64KiB increments.
+                    This would allow the user to reserve, say, 256KiB of virtual address space, and then map 64KiB pages within that address space on separate occassions, perhaps not even using the whole space. <br>
+                    Large pool memory can be mapped using any of the settings in the <span class="inlineCode">map_flags</span> enum. This means all GPU allocations need to go through the large pool allocation; for small GPU allocations, a 
+                    specialised GPU allocator should be created that allocates from large pool memory. Regardless, the memory must be mapped both aligned to and in increments of, 64 KiB.
+                </p>
+                <p>
+                    For easy access to memory allocation, the framework provides the <span class="inlineCode">mem_alloc</span> and <span class="inlineCode">mem_free</span> macros. These macros will 
+                    allocate memory from the small pools (the only way to access these pools), or reserve and map the appropriate amount of memory from a large pool, and free that memory respectively. 
+                </p>
+                <p>
+                    The framework also provides thread-local scratch memory, with 1GiB of reserved virtual address space. Also called frame allocation, this provides temporary linear allocations, suitable for temporary
+                    allocations, such as in-function allocations. An EP_ScratchAllocator is also provided to allow containers to utilise this memory. Scratch memory is mapped in increments of 512KiB, only when more space is needed. 
+                    Similarly to small pool memory, scratch memory forms a "high-watermark" of usage, to prevent frequent remapping of memory.  
+                </p>
+                <p>
+                    Memory allocation access is thread-safe, using mutex locks.
+                </p>
+
+                <h2 class="cvHeader">Debug Features</h2>
+                <p>
+                    The framework also provides debug features in the form of tracking each allocation made, including the name of the function, file and line that it came from. The usage of each pool is also 
+                    tracked, both to help track leaks and to keep an eye on how many small allocations are being made; small allocations are generally not going to be worth the cost versus more thoughtful design of client code.<br>
+                    The debug features provided certainly have room for improvement, but there is a good baseline provided. 
+                </p>
+
+                <h2 class = "cvHeader">API Examples</h2>
+                <p>
+                    The standard way to interact with the memory system is with the mem_alloc macro. This is the method used by <span class="inlineCode">new</span>. There are also variations on the macro for extra functionality or convenience.
+                </p>
+                <p class = "code">
+                    // Allocate some memory<br>
+                    uint64 mem_size = 2_KiB;<br>
+                    Byte* out_mem = (Byte*)mem_alloc(mem_size);<br>
+                    <br>
+                    // Allocate some aligned memory<br>
+                    uint64 mem_size = 2_KiB;<br>
+                    uint64 alignment = 8_KiB;<br>
+                    Byte* out_mem = (Byte*)mem_alloc_aligned(mem_size, alignment);<br>
+                    <br>
+                    // Allocate some zeroed memory<br>
+                    Byte* out_mem = (Byte*)mem_calloc(1);<br>
+                    EP_ASSERT(*out_mem == 0, "Memory must be cleared");<br>
+                    <br>
+                    // Allocate memory of given type<br>
+                    struct S {<br>
+                    &nbsp;&nbsp;uint32 m;<br>
+                    }<br>
+                    S* out_mem = mem_alloc_type(S);<br>
+                    <br>
+                    // Free memory<br>
+                    mem_free(out_mem);
+                </p>    
+                <p>
+                    Mapping memory from the large pools is only slightly more involved. You may note that the reserve function takes a pointer argument; this returns the full size of the reserved 
+                    block. For example, requesting a reservation of 40KiB will actually reserve 64KiB.
+                </p>
+                <p class = "code">
+                    // Reserve some space <br>
+                    uint64 reserve_size = 64_KiB; <br>
+                    Byte* reserved_mem = (Byte*)mem_reserve(&reserve_size);            // Output real size with pointer<br>
+                    <br>
+                    // Map the memory for CPU read-write<br>
+                    uint64 map_size = 64_KiB;
+                    mem_map(reserved_mem, map_size, map_flags::cpu_rw);<br>
+                    <br>
+                    // Free the memory<br>
+                    mem_unmap(reserved_mem, mapped_size);<br>
+                    mem_release(reserved_mem);<br>
+                    <br>
+                    // Map some, for example, shader memory<br>
+                    mem_map(reserved_mem, map_size, map_flags(cpu_write | gpu_read));
+                </p>
+                <p>
+                    Allocating scratch memory is also done through global functions as opposed to macros. See <a href="EP_ScratchMemory.h" class ="downloadLink">EP_ScratchMemory.h</a> 
+                    for an explanation of how certain frame management functions work. Scratch allocated memory is never invalidated, so you can still store and dereference it safely, but it will
+                    almost certainly be overwritten by other callers. This can lead to tricky bugs, so ensure that scratch allocations are always temporary.
+                </p>
+                <p class = "code">
+                    // Start a new scratch frame<br>
+                    scratch_push();<br>
+                    <br>
+                    // Allocate some temp memory<br>
+                    void* temp_mem = scratch_alloc(2_KiB);<br>
+                    <br>
+                    // Reset the frame<br>
+                    scratch_pop();<br>
+                    <br>
+                    // Allocate more memory<br>
+                    void* more_memory = scratch_alloc(2_KiB);<br>
+                    <br>
+                    // Observe that the memory address is the same<br>
+                    EP_ASSERT(temp_mem == more_memory, "");
+                </p>
+
+                <h2 class="cvHeader">Containers and Allocators</h2>
+                <p>
+                    To properly make use of the custom memory system, and to improve performance, the framework provides a set of containers to replace those provided by the std library. 
+                    Within the ep namespace, you will find, for example, EP_Vector and EP_String; these new containers are templated with respect to an AllocatorT, which is a structure or class
+                    following the EP_Allocator standard. The <a href="EP_Allocator.h" class ="downloadLink">EP_Allocator.h</a> file provides an example of an allocator, providing the minimum interfaces.
+                </p>
+                <p class="code">
+                    class EP_AllocatorTemplate<br>
+                    {<br>
+                    public:<br>
+                    &nbsp;&nbsp;    EP_AllocatorTemplate();<br>
+                    &nbsp;&nbsp;    void* Alloc(uint64 size);<br>
+                    &nbsp;&nbsp;    void Dealloc();<br>
+                    <br>
+                    &nbsp;&nbsp;    Byte* data() const;<br>
+                    &nbsp;&nbsp;    uint64 size() const;<br>
+                    <br>
+                    private:<br>
+                    &nbsp;&nbsp;    Byte* dataPtr_;<br>
+                    &nbsp;&nbsp;    uint64 mappedSize_;<br>
+                    };
+                </p>
+                <p>
+                    The same file also provides the EP_DefaultAllocator, which is the default AllocatorT for all framework containers. The EP_DefaultAllocator uses 64KiB large pool pages as a default,
+                    and supports automatic extension of mapped space if reserved space allows. The allocator is too general to be super efficient in any scenario, though functions such as EP_Vector::reserve()
+                    can improve the performance. It is recommended that containers use specialized allocators, such as the EP_ScratchAllocator for temporary vectors.                     
+                </p>
+                <p>
+                    The EP_ScratchAllocator interacts directly with the scratch allocation functions built in; every time an EP_ScratchAllocator attempts to allocate, the scratch allocation system checks 
+                    that it is allowed to allocate more memory. Scratch allocators can allocate linearly without ever having to copy-on-resize, with the stipulation that it cannot allocate any more once a scratch 
+                    allocation has been made by another allocator.  
+                </p>
+
+                <p>
+                    Potential Updates<br>
+                    - Output memory debug information to HTML or XML formats<br>
+                    - Thread-local small pools to avoid mutex locks<br>
+                    - Change default page size to 4KiB to reduce EP_DefaultAllocator overhead<br>
+                    - Memory-mapped file IO to avoid copying of file contents<br>
+                    - Debug-only address annotation, to track intended ownership of memory
+                </p>
+
+                <br><br><br><br>
+                <br><br><br><br>
+            </div>
+
+        </div>
+
+    </div>
+</body>
+
+
+</html>

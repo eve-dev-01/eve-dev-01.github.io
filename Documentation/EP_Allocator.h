@@ -1,0 +1,41 @@
+#pragma once
+
+#include "EP_Numerics.h"
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class EP_AllocatorTemplate
+{
+public:
+	EP_AllocatorTemplate();
+	void* Alloc(uint64 size);
+	void Dealloc();
+
+	Byte* data() const;
+	uint64 size() const;
+
+private:
+	Byte* dataPtr_;
+	uint64 mappedSize_;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class EP_DefaultAllocator
+{
+public:
+	EP_DefaultAllocator();
+
+	void Alloc(uint64 size);
+	void Dealloc();
+
+	Byte* data() const {return dataPtr_;} ;
+	uint64 size() const { return mappedSize_; };
+
+private:
+	Byte* dataPtr_;
+	uint64 reserveSize_;
+	uint64 mappedSize_;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
