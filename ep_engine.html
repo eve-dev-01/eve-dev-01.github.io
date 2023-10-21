@@ -14,24 +14,60 @@
                 margin-right: 10px;
                 border:1.5px solid aqua;
                 border-radius: 5px;
+            
+                font-size:15pt;
+                min-height:150px;
+                min-width: 0px;
+                display:flex;
             }
-            .text-box-contents {
+            .text-box-element {
                 padding-left:10px;
                 padding-right: 10px;
                 padding-top: 10px;
                 padding-bottom: 10px;
             }
+            .text-box-contents {
+                height:100%;
+            }
+            .text-box-image-box {
+                width:520px;
+                height: 320px;           
+                overflow:hidden;
+                object-fit: cover;
+                border-radius: 2px;
+            }
+            .text-box-image {
+                width:520px;
+                height:320px;
+                object-fit:cover;
+            }
         </style>
     </head>
+
+
     <body style="color:lightgrey">
         <div class="text-box">
-            <div class="text-box-contents">
-                The EP Engine is a lightweight multi-platform framework for efficient app development. Featuring a low-overhead ECS, custom memory systems, physically based rendering, a custom mesh format and the associated data build across three platforms, this has been a labour of love.
-                From its humble beginnings as an application testing different topologies in DirectX 11, the scope has gradually increased, and has been an excellent learning opportunity. If the EP Engine could be summed up in a phrase, it would be <b>everything is worth making once</b>. 
+            <div class="text-box-element">
+                <div class="text-box-contents">
+                    The EP Engine is a lightweight multi-platform framework for efficient app development. Featuring a low-overhead ECS, custom memory systems, physically based rendering, a custom mesh format and the associated data build across three platforms, this has been a labour of love.
+                    From its humble beginnings as an application testing different topologies in DirectX 11, the scope has gradually increased, and has been an excellent learning opportunity. If the EP Engine could be summed up in a phrase, it would be <b>everything is worth making once</b>. 
+                </div>
+            </div>
+            <div class="text-box-element">
+                <div class="text-box-image-box">
+                    <img class="text-box-image" src="Images/homepage/FinalOutput.png">
+                    </img>
+                </div>
             </div>
         </div>
         <br>
         <div class="text-box">
+            <div class="text-box-element">
+                <div class="text-box-image-box">
+                    <img class="text-box-image" src="Images/ep_engine/MeshInput.png">
+                    </img>
+                </div>
+            </div>
             <div class="text-box-contents">
                 The EP Mesh format is used to reduce the loading times and memory footprints of 3D geometry. Each mesh stores only the required data per vertex; each mesh has 9 available channels, but the only required channel is the position. Shader-side, a bitset is used to determine which 
                 channels should be considered, allowing shaders to support multiple configurations of mesh without needing multiple pipeline state objects. GPU-side branching cost is negligible with this approach, as each vertex will follow the same control path.
@@ -42,6 +78,12 @@
             <div class="text-box-contents">
                 These meshes are used in the physically based rendering model. Based on the Epic Games model, meshes are expected to provide albedo, metallic, roughness, normal and ambient occlusion maps. This allows for complex material appreances at low runtime cost, for a small memory overhead. 
                 If a mesh cannot provide its own textures, defaults are available.
+            </div>
+            <div class="text-box-element">
+                <div class="text-box-image-box">
+                    <img class="text-box-image" style="object-fit: contain;" src="Images/ep_engine/MeshTextures.png">
+                    </img>
+                </div>
             </div>
         </div>
         <br>
