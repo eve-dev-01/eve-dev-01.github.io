@@ -1,0 +1,156 @@
+<DOCTYPE! html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>E Powell: EP Numerics</title>
+    <meta name="description" content="Documentation for memory management in the EP framework">
+    <meta name="keywords" content="memory">
+    <meta name="author" content="Eve Powell">
+
+    <style>
+        #container {
+            position:relative;
+            min-height:100vh;
+        }
+        #documentPage {
+            width:90%;
+            min-height:90vh;
+            padding:0px 5% 30px 5%;
+            
+            font-size:12px;
+            background-color:#6EB5FF;
+            opacity:90%;
+            display:flex;
+            justify-content:center;
+        }
+        #document {
+            opacity:100%;
+            width:540px;
+            padding:30px;
+            background-color:white;
+            color:black;
+            font-family:Arial, Helvetica, sans-serif;
+        }
+        #documentTitle {
+            display:inline-block;
+            width:520px;
+            font-size:20px;
+            height:20px;
+            padding:10px;
+            font-weight:bold;
+            color:cornflowerblue;
+        }
+        .cvHeader {
+            font-size:13px;
+            color:cornflowerblue;
+            font-weight:bold;
+        }
+        .cvSubHeader {
+            font-size:12px;
+            color:black;
+            font-weight:bold;
+        }
+        .code {
+            margin-left:15px;
+            margin-right:15px;
+            padding:4px;
+            padding-left:4%;
+            padding-right:4%;
+            background-color: rgb(121, 114, 114);
+            color:white;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .inlineCode {
+            padding-left: 2px;
+            padding-right:2px;
+            background-color: rgb(121, 114, 114);
+            color:white;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        </style>
+</head>
+
+
+<body>
+    <div id="container">
+
+        <div id="documentPage">
+            <div id="document">
+                <h1 id="documentTitle">EP Numerics</h1>
+                <br>
+
+                <h2 class = "cvHeader">Standard Types</h2>
+                <p>
+                    The EP Framework defines standard types of fixed size to guarantee that cross-platform code will always use the same data sizes.   
+                </p>
+                <p class="code">
+                    int8,    int16,    int32,    int64 <br>
+                    uint8,   uint16,   uint32,   uint64<br>
+                    float32, float64<br>
+                    char8,   char16<br>
+                    Byte   
+                </p>
+                <p>
+                    The EP_Numerics.h file also provides some standard functions for Endian-swaps, alignment, and memory-size literals, such as <span class="inlineCode">_KiB</span>.
+                    It also provides build-in values for the minimum and maximum values of the standard types.
+                </p>
+
+                <h2 class="cvHeader">Core Math</h2>
+                <p>
+                    The EP_CoreMath.h file provides a set of basic core math functions. These include<br>
+                    - Clamp function <br>
+                    - Min/max function <br>
+                    - Square and cube <br>
+                    - Lerp, smooth lerp and smoother lerp<br>
+                    - Mapping value within range <br>
+                    - String to float and int
+                </p>
+                
+                <h2 class="cvHeader">Bit Operations</h2>
+                <p>
+                    The EP_Bitwise.h file provides a set of basic bitwise operations. These include<br>
+                    - Or, and, xor, not<br>
+                    - Left and right shift <br>
+                    - Low and high masking <br>
+                    - Bit setting and unsetting
+                </p>
+
+                <h2 class="cvHeader">Random</h2>
+                <p>
+                    EP_Random.h provides an intended replacement for the std::rand() functionality. It implements a Mersenne twister with a very lightweight interface for accessing randomised values. 
+                </p>
+                <p class="code">
+                    namespace ep<br>
+                    {<br>
+                        &nbsp;&nbsp;    // Seed the generator, must be called before any values are extracted<br>
+                        &nbsp;&nbsp;    void rand_seed(uint32);<br>
+                    
+                        &nbsp;&nbsp;    int32 rand32(); <br>
+                        &nbsp;&nbsp;    int64 rand64(); <br>
+                        &nbsp;&nbsp;    uint32 randu32();<br>
+                        &nbsp;&nbsp;    uint64 randu64();<br>
+                        &nbsp;&nbsp;    float32 randf32();<br>
+                        &nbsp;&nbsp;    float64 randf64();<br>
+                    }
+                </p>
+                <p>
+                    Functions are provided for accessing floats, ints and uints in both 32- and 64-bit. The validity of the randomness of the 64 bit values is in question, so prefer 32-bit values.  
+                </p>
+
+                <p>
+                    Potential Updates<br>
+                    - Implement basic atomic operations
+                </p>
+
+                <br><br><br><br>
+                <br><br><br><br>
+            </div>
+
+        </div>
+
+    </div>
+</body>
+
+
+</html>

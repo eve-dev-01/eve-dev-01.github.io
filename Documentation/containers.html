@@ -1,0 +1,188 @@
+<DOCTYPE! html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>E Powell: EP Containers</title>
+    <meta name="description" content="Documentation for memory management in the EP framework">
+    <meta name="keywords" content="memory">
+    <meta name="author" content="Eve Powell">
+
+    <style>
+        #container {
+            position:relative;
+            min-height:100vh;
+        }
+        #documentPage {
+            width:90%;
+            min-height:90vh;
+            padding:0px 5% 30px 5%;
+            
+            font-size:12px;
+            background-color:#6EB5FF;
+            opacity:90%;
+            display:flex;
+            justify-content:center;
+        }
+        #document {
+            opacity:100%;
+            width:540px;
+            padding:30px;
+            background-color:white;
+            color:black;
+            font-family:Arial, Helvetica, sans-serif;
+        }
+        #documentTitle {
+            display:inline-block;
+            width:520px;
+            font-size:20px;
+            height:20px;
+            padding:10px;
+            font-weight:bold;
+            color:cornflowerblue;
+        }
+        .cvHeader {
+            font-size:13px;
+            color:cornflowerblue;
+            font-weight:bold;
+        }
+        .cvSubHeader {
+            font-size:12px;
+            color:black;
+            font-weight:bold;
+        }
+        .code {
+            margin-left:15px;
+            margin-right:15px;
+            padding:4px;
+            padding-left:4%;
+            padding-right:4%;
+            background-color: rgb(121, 114, 114);
+            color:white;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .inlineCode {
+            padding-left: 2px;
+            padding-right:2px;
+            background-color: rgb(121, 114, 114);
+            color:white;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        </style>
+</head>
+
+
+<body>
+    <div id="container">
+
+        <div id="documentPage">
+            <div id="document">
+                <h1 id="documentTitle">EP Containers</h1>
+                <br>
+
+                <h2 class = "cvHeader">Container Types</h2>
+                <p>
+                    The EP Framework provides a set of standard containers to replace those of the std library, with the aim of improving operating speed, and allowing better interfacing with the EP Memory system.
+                    The list of supported containers grows as the framework is updated, but this document will detail the most important of those that exist. 
+                </p>
+                <p>
+                    The vast majority of EP container types live in the ep namespace, and use the EP_Allocator interface. Details of this can be seen in the <a href="EP_Memory.html" class="downloadLink">memory documentation</a>.
+                </p>
+                
+                <h2 class="cvHeader">Vector</h2>
+                <p>
+                    The EP_Vector has is templated with respect to two types; <br>
+                    - T, the data type to be contained<br>
+                    - AllocatorT, the allocator type to use
+                </p>
+                <p>
+                    The object keeps an AllocatorT member. The AllocatorT is used to allocate memory, which must be both reserved and mapped. The Byte* produced by the AllocatorT is reinterpreted to T* for vector operations. 
+                    Similarly, operations such as <span class="inlineCode">sizeof(T)</span> are used to call AllocatorT functions.
+                </p>
+                <p>
+                    The majority of vector operations are shared with std::vector, with some missing functions; it was decided that keeping the interface small was more useful than providing many of the oft-unused vector functions.
+                    Some functions have been omitted for safety reasons; with the restrictions of our memory system, functions such as <span class="inlineCode">std::vector::shrink_to_fit</span> would very often do nothing, and could
+                    encourage thoughtless use of the vector class; vectors should be used sparingly, as with any dynamic allocation. The container does not support comparison operators because I believe it to be nonsense.
+                </p>
+                <p>
+                    One omission that needs to be addressed is the absense of an emplace function; this will be implemented in future updates. <br>
+                    Iterator, const iterator and reverse iterator are provided. 
+                </p>
+                <p>
+                    The vector container should be used to emulate other containers, such as an intrusive linked list, or stack. This keeps the codebase small and manageable, at the expense of development time of client code. 
+                </p>
+
+                <h2 class="cvHeader">String</h2>
+                <p>
+                    The EP_String is templated with respect to two types; <br>
+                    - charT, the character type to use <br>
+                    - AllocatorT, the allocator type to use<br>
+                    Two default types are defined; <span class="inlineCode">ep::ep_cstring</span> for charT of char8, and <span class="inlineCode">ep::ep_wstring</span> for charT of char16.
+                </p>
+                <p>
+                    The object keeps an AllocatorT member. The AllocatorT is used to allocate memory, which must be both reserved and mapped. The Byte* produced by the AllocatorT is reinterpreted as a charT for string operations.
+                    Similarly, operations such as <span class="inlineCode">sizeof(charT)</span> are used to call AllocatorT functions.
+                </p>
+                <p>
+                    The majority of string operations are shared with std::string, although with many missing functions. This is largely due to not having needed them so far. The framework encourages to use raw strings where possible,
+                    and storage of string identifiers should be done with hashed values. EP_String should only be used either as a helper class for string manipulation, or more appropriately in the rare instance that a user-displayed string 
+                    that cannot be decided at compile time is needed. Even then, it is recommended that the user sticks to <span class="inlineCode">const char8*</span> and equivalent where possible and reasonable.
+                </p>
+                <p>
+                    A glaring omission is the lack of <span class="inlineCode">sprintf</span> functionality, which should be implemented. The code to handle this is present in EP_Assert.cpp, but a refactor will be needed 
+                    to support EP_String using these functions.
+                </p>
+
+                <h2 class = "cvHeader">Hash Table</h2>
+                <p>
+                    The EP framework supports hashing of char arrays to a uint32 value. Hash functions are provided as static class functions by hash helper classes, such as EP_DefaultHash.  
+                </p>
+                <p class="code">
+                    class EP_DefaultHash <br>					
+                    { <br>
+                    public: <br>
+                    &nbsp;&nbsp;    typedef EP_StringID ResultType; <br>
+                    &nbsp;&nbsp;    constexpr static uint32 INIT_VAL = 16777619u; <br>						
+                    &nbsp;&nbsp;    constexpr static uint32 HASH_PRIME = 2166136261u;<br>
+                    &nbsp;&nbsp;    <br>
+                    &nbsp;&nbsp;    template &lt;typename charT&gt; <br>
+                    &nbsp;&nbsp;    constexpr static ResultType RunHash(uint32 currHash, charT newChar) <br>
+                    &nbsp;&nbsp;    {<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;    ResultType out = currHash ^ newChar; <br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;    out *= HASH_PRIME;<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;    return out;<br>
+                    &nbsp;&nbsp;    }<br>
+                    };
+                </p>
+                <p>
+                    The <span class="inlineCode">RunHash</span> function is necessary for a valid hash class. The default hash uses the FNV-1a algorithm.
+                </p>
+                <p>
+                    The EP_StringHashTable is templated with respect to 3 types; <br>
+                    - valueT, the type of values to be represented by hash keys<br>
+                    - HashT, the type that provides the RunHash static function<br>
+                    - AllocatorT, the allocator type to use
+                </p>
+                <p>
+                    When adding a valueT to the container, it must be given with an appropriate string ID, or string to be hashed. To access the valueT, you use <span class="inlineCode">operator[]</span>
+                    with the string ID as an argument. The container uses linear probing to resolve hash collisions. 
+                </p>
+
+                <p>
+                    Potential Updates<br>
+                    - Provide a standard ring buffer implementation <br>
+                    - Provide natvis files for non-vector containers<br>
+                    - Implement a typeless hash to allow hashing of any identifier type
+                </p>
+
+                <br><br><br><br>
+                <br><br><br><br>
+            </div>
+
+        </div>
+
+    </div>
+</body>
+
+
+</html>

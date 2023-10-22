@@ -1,0 +1,170 @@
+<DOCTYPE! html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>E Powell: EP Input Core</title>
+    <meta name="description" content="Documentation for memory management in the EP framework">
+    <meta name="keywords" content="memory">
+    <meta name="author" content="Eve Powell">
+
+    <style>
+        #container {
+            position:relative;
+            min-height:100vh;
+        }
+        #documentPage {
+            width:90%;
+            min-height:90vh;
+            padding:0px 5% 30px 5%;
+            
+            font-size:12px;
+            background-color:#6EB5FF;
+            opacity:90%;
+            display:flex;
+            justify-content:center;
+        }
+        #document {
+            opacity:100%;
+            width:540px;
+            padding:30px;
+            background-color:white;
+            color:black;
+            font-family:Arial, Helvetica, sans-serif;
+        }
+        #documentTitle {
+            display:inline-block;
+            width:520px;
+            font-size:20px;
+            height:20px;
+            padding:10px;
+            font-weight:bold;
+            color:cornflowerblue;
+        }
+        .cvHeader {
+            font-size:13px;
+            color:cornflowerblue;
+            font-weight:bold;
+        }
+        .cvSubHeader {
+            font-size:12px;
+            color:black;
+            font-weight:bold;
+        }
+        .code {
+            margin-left:15px;
+            margin-right:15px;
+            padding:4px;
+            padding-left:4%;
+            padding-right:4%;
+            background-color: rgb(121, 114, 114);
+            color:white;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .inlineCode {
+            padding-left: 2px;
+            padding-right:2px;
+            background-color: rgb(121, 114, 114);
+            color:white;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        </style>
+</head>
+
+
+<body>
+    <div id="container">
+
+        <div id="documentPage">
+            <div id="document">
+                <h1 id="documentTitle">EP Input Core</h1>
+                <br>
+
+                <h2 class = "cvHeader">Supported Hardware</h2>
+                <p>
+                    The EP Framework provides abstractions for mice, keyboard, and gamepads limited to the Xbox gamepad feature set.
+                </p>
+                
+                <h2 class="cvHeader">Keyboard</h2>
+                <p>
+                    The keyboard abstraction is designed to be relatively lightweight in terms of features. It holds a key state for each ASCII character and a key state for each enumerated
+                    <span class="inlineCode">EP_SpecialKey</span>. Platform implementations will read the character code using system functions, and set the appropriate state. These character codes
+                    are also added to the keyboard stream, which can be read to find text input from a given frame.<br>
+                    For each key, we maintain a record of if it is pressed and if it is a valid key to be read (some key codes are reserved). We also calculate whether the button press/release is new to this frame.
+                </p>
+                <p class="code">
+                    EP_Keyboard* KB;<br>
+                    EP_KeyboardStream* KBStream;<br>
+                    <br>
+                    // Read special key pressed state<br>
+                    pressed = KB->IsSpecialKeyPressed(EP_SpecialKey::Ctrl);<br>
+                    <br>
+                    // Check if a key was pressed this frame and not last frame<br>
+                    fresh = KB->IsKeyPressedFresh('a');<br>
+                    <br>
+                    // Get frame text input<br>
+                    const char* typed = KBStream->GetKeyboardStreamContents();
+                </p>
+
+                <h2 class="cvHeader">Mouse</h2>
+                <p>
+                    The mouse abstraction is designed with flexibility in mind. It holds the state of 3 buttons, Left, Middle and Right, each of which holds their pressed state, and whether this state is newly 
+                    set or unset (fresh pressed and fresh released). It also maintains 2 float values representing the position of the mouse cursor. Where some implementations hold the change, this implementation
+                    holds the position. Each axis of this position stores a value as read from operating systems, and a value based on normalizing the value within a provided range; if this range was the whole 
+                    screen size, this normalized value would be expected to be in the range [0,1]. The normalized value can be negative and this should be accounted for in client code. This range can be adjusted 
+                    at runtime.
+                </p>
+                <p class="code">
+                    // Read axis values<br>
+                    float32 XRaw = Mouse->GetAxisValueRaw(MouseAxes::AxisX);<br>
+                    float32 xNrm = Mouse->GetAxisValueNormalized(MouseAxes::AxisX);<br>
+                    <br>
+                    // Read button press <br>
+                    bool left = Mouse->IsButtonPressed(EP_MouseButtons::Left);<br>
+                    bool fresh = Mouse->IsButtonPressedFresh(..); <br> 
+                    <br>
+                    // Update axis range<br>
+                    Mouse->SetNewAxisBounds(MouseAxes::AxisX, 0.1f, 0.5f);<br>
+                </p>
+
+                <h2 class="cvHeader">Gamepad</h2>
+                <p>
+                    The gamepad abstraction is based off the standard XInput controller. It supports<br>
+                    -  4 face buttons (e.g. A, B, X, Y)<br>
+                    -  4 D-pad buttons<br>
+                    -  Start and select buttons<br> 
+                    -  Stick buttons<br>
+                    -  Left and right bumper buttons<br>
+                    -  2 analog trigger inputs<br>
+                    -  2 analog 2-axis stick inputs
+                </p>
+                <p>
+                    All button inputs are enumerated by <span class="inlineCode">EP_GamepadButtons</span>, and the analogs in their own enumerations, which can be seen in <a href="EP_Gamepad.h" class="downloadLink">EP_Gamepad.h</a>. 
+                    Button inputs all store their pressed state, and whether they are newly pressed or released. 
+                </p>
+                <p>
+                    Trigger inputs store a customisable maximum bound, which will be 1 by default. For mapping other hardware to this controller, this may need to be increased. A normalized value that is in the range [0,1] is also
+                    calculated and stored. A dead zone can also be set in code. Trigger input always goes in the positive direction and should not be negative.
+                </p>
+                <p class="code">
+                    float32 maxBound = 1.f;			// maximum value for normalization<br>
+                    float32 valRaw = 0.f;			// the raw readable input<br>
+                    float32 valNormalized = 0.f;	// the [0,1] normalized input<br>
+                    float32 valNoDead = 0.f;		// the actual raw input<br>
+                    float32 deadZone = 0.1f;		// the minimum value before writing to val raw
+                </p>
+                <p>
+                    Stick axis inputs are very similar to trigger inputs except they store dead zone and bound information in the positive and negative directions, as stick input can be positive or negative.
+                </p>
+
+                <br><br><br><br>
+                <br><br><br><br>
+            </div>
+
+        </div>
+
+    </div>
+</body>
+
+
+</html>

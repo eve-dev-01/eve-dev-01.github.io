@@ -132,6 +132,13 @@
                     custom allocators have been written, and replacements for some STL containers provided, to properly use the system.<br>
                     The system is explained in more detail in <b><u><a href="Documentation/EP_Memory.html" style="color:white;">the documentation here</a></u></b>.
                 </div>
+                <div class="text-box-element">
+                    <div class="text-box-image-box">
+                        <img class="text-box-image" style="object-fit: contain;" src="Images/ep_engine/ScratchAllocation.png"
+                            alt="Scratch allocation system internals">
+                        </img>
+                    </div>
+                </div>
             </div>
             <br>
             <div class="text-box">
@@ -140,9 +147,23 @@
                     a common implementation needs to exist, and in this case, the common implementation has a platform implementation as a member (e.g. EP_RenderContext_Platform). Using environment variables and the dedicated EP_PLATFORM_HEADER macro, only the platform-specific headers are included. The renderer, input systems, shaders, 
                     virtual memory interface, and much more has all required platform specific work. Using the macro to generate include paths has proved a very effective tool.
                 </div>
+                <div class="text-box-element">
+                    <div class="text-box-image-box">
+                        <img class="text-box-image" style="object-fit: contain;" src="Images/ep_engine/FencePlatform.png"
+                            alt="A basic demo of platform specificity; DX12 implementation of Fence, used only on that platform">
+                        </img>
+                    </div>
+                </div>
             </div>
             <br>
             <div class="text-box">
+                <div class="text-box-element">
+                    <div class="text-box-image-box">
+                        <img class="text-box-image" style="object-fit: contain;" src="Images/ep_engine/DataBuildDefinition.png"
+                            alt="A basic demo of platform specificity; DX12 implementation of Fence, used only on that platform">
+                        </img>
+                    </div>
+                </div>
                 <div class="text-box-contents">
                     As different platforms use different data formats, from DDS to wchar, a dedicated data build is required. This program uses assimp to handle model loading and interpretation. The build runs from an XML definition file, which for each asset defines a source path (where the asset is), a destination path (the path the final program should use to access it), and a unique string key.
                     From this, source assets are converted to platform- or engine-specific formats, and a data manifest is created, which links the hashes of these string keys to the destination path, allowing game code to very simply reference assets. Asset packages are a simple list of string keys, that are used to load a group of assets with a single call. 
@@ -151,7 +172,16 @@
             <br>
             <div class="text-box">
                 <div class="text-box-contents">
-                    Other features not deserving of their own sections include a custom random implementation (Mersenne twister), graphics resource managers, a safe-shut system for graphics resources, custom sprite batch and font rendering, a basic XML-driven UI system, texture array support, and an input events system. 
+                    Other features not deserving of their own sections include a custom random implementation (Mersenne twister), graphics resource managers, a safe-shut system for graphics resources, custom sprite batch and font rendering, a basic XML-driven UI system, texture array support, and an input events system.
+                    
+                    <br><br>
+                    There is some more documentation available below.
+                    <br>
+                    <u><a href="Documentation/containers.html" style="color:white;">Gamepad Documentation</a></u>
+                    <br>
+                    <u><a href="Documentation/input.html" style="color:white;">Containers Documentation</a></u>
+                    <br>
+                    <u><a href="Documentation/numerics.html" style="color:white;">Numerics Documentation</a></u>
                 </div>
             </div>
         </div>
