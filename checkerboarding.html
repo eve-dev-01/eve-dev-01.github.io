@@ -51,13 +51,21 @@
             <div class="text-box">
                 <div class="text-box-contents">
                     The core of the technique is that alternating 2x2 regions render every frame, with the rendered region flipping. Imagining the final presented image as a checkerboard, on one frame only the black squares would be truly rendered; on the next frame only the white. <br>
-                    The image shows a sample of the starting depth buffer, with each red and black square representing a 2x2 pixel region. 
+                </div>
+                <div class="text-box-element">
+                    <div class="text-box-image-box">
+                        <img class="text-box-image" style="object-fit: contain;" src="Images/check/HalfRender.png"
+                            alt="The frame midway through reconstruction">
+                        </img>
+                    </div>
                 </div>
             </div>
             <br>
             <div class="text-box">
                 <div class="text-box-contents">
                     While many techniques use a quarter sized render target (half width, half height) with an offset viewport to achieve this, I use an alternate approach, which is a depth-prepass of sorts. We simply render the 2x2 black or white squares, at a set depth of 0, meaning nothing will ever pass their depth test. 
+                    <br>
+                    The image shows a sample of the starting depth buffer, with each red and black square representing a 2x2 pixel region. 
                 </div>
                 <div class="text-box-element">
                     <div class="text-box-image-box">

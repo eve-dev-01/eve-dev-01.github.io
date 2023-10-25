@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html style="background-color:black;">
+    <head>
+        <meta charset="UTF-8">
+		<title>EP Engine</title>
+		<link href="Styles/MainPage.css" rel="stylesheet" type="text/css"></link>
+		<link href="Styles/ProjectPage.css" rel="stylesheet" type="text/css"></link>
+        <link href="Styles/NavBar.css" rel="stylesheet" type="text/css"></link>
+        <meta name="description" content="My portfolio! Come see my work, especially the multi-platform renderer!">
+		<meta name="keywords" content="computer,science,games,development,portfolio">
+		<meta name="author" content="Eve Powell">
+    </head>
+
+
+    <body style="color:lightgrey">
+		<header>
+			<div id="nav-bar-container">
+				<div id="nav-bar">
+					<span style="justify-self: left;">
+						Eve Powell: Portfolio
+					</span>
+					<div id="nav-bar-options">
+						<span class="nav-bar-option">
+							<a class="nav-bar-link" href="index.html">Home</a>
+						</span>
+						<span class="nav-bar-option">
+							<a class="nav-bar-link" href="ep_engine.html">EP Engine</a>
+						</span>
+						<span class="nav-bar-option">
+							<a class="nav-bar-link" href="triage_story.html">Triage Story</a>
+						</span>
+					</span>
+				</div>
+			</div>
+		</header>
+		<br>
+		<br>
+
+
+        <div class="text-boxes-container">
+            <div class="text-box">
+                <div class="text-box-element">
+                    <div class="text-box-contents">
+                        This work was completed as part of a module on multi-threading; the EP Engine features an Entity-Component-System framework, which strictly follows the set principles. Data and code are separate; an entity can have 0 or 1 of a given component; component references are not to be stored directly, favouring instead a temporally stable Entity ID.
+                        <br><br>
+                        Components use a hand built RTTI system; a macro in the struct definition adds in the data needed to run the RTTI, and a macro in a single cpp file initialises all the required static data, including registering the type to a central type information manager.      
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="text-box">
+                <div class="text-box-element">
+                    <div class="text-box-image-box">
+                        <img class="text-box-image" src="Images/ecs/TypeIDs.png" alt="A screen showing a text choice">
+                        </img>
+                    </div>
+                </div>
+                <div class="text-box-contents">
+                    Each component type is given a unique ID, which is used to convert a type into data, using a function-level static variable in a templated function. Component space is only reserved for types that have been properly declared as component types in this way. <br>
+                    Code can then request access to specific components through the framework provided.        
+                </div>
+            </div>
+            <br>
+            <div class="text-box">
+                <div class="text-box-contents">
+                    Systems only execute when they are registered to the framework; at registration they must provide the IDs of every component type for which they require read-access or write-access. When code from a given system attempts to use a component type, these dependencies are checked, 
+                    and enforced; the program will break if a system attempts to access a component for which it does not have permission.  
+                </div>
+                <div class="text-box-element">
+                    <div class="text-box-image-box">
+                        <img class="text-box-image" style="object-fit: contain;" src="Images/ecs/Registration.png"
+                            alt="An example of a system being registered into the framework">
+                        </img>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="text-box">
+                <div class="text-box-contents">
+                    Knowing the type dependencies of each system, we can develop a map of system-system dependencies; we can say system A is dependent on system B if system B writes to a type from which system A reads. This becomes a standard dependency graph, with respect to the accessed type.      
+                </div>
+                <div class="text-box-element">
+                    <div class="text-box-image-box">
+                        <img class="text-box-image" style="object-fit: contain;" src="Images/ecs/DependencyGraph.png"
+                            alt="A dependency graph of four systems, and their dependencies">
+                        </img>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="text-box">
+                <div class="text-box-contents">
+                    Using this dependency graph, we can easily and safely delegate systems amongst multiple threads; we can guarantee that no two systems are contending for write access, and that no system is reading a component mid-write. For this, we have a job-system; the main thread acts as a manager, delegating work to 
+                    worker threads, in the form of a system function pointer. Only when that system is complete does the manager thread remove a given system and its dependencies from the graph, potentially enabling another system to begin.      
+                </div>
+                <div class="text-box-element">
+                    <div class="text-box-image-box">
+                        <img class="text-box-image" style="object-fit: contain;" src="Images/ecs/DependencyGraphExecuting.png"
+                            alt="A dependency graph mid execution">
+                        </img>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="text-box">
+                <div class="text-box-contents">
+                    The system does not account for some niche cases, such as deep dependency chains. I will let the image speak on this. 
+                </div>
+                <div class="text-box-element">
+                    <div class="text-box-image-box">
+                        <img class="text-box-image" style="object-fit: contain;" src="Images/ecs/DeepDependencies.png"
+                            alt="A dependency graph with a chain of systems 5 deep, versus 3 systems with no later dependencies. It makes the point that addressing deeper chains earlier is a better strategy">
+                        </img>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="text-box">
+                <div class="text-box-contents">
+                    Internally, the manager thread signals a semaphore to wake up a given worker thread. The worker thread then completes the task it was set, and upon completion signals the manager thread. Upon waking, the manager thread cleans up workers that have finished, and delegates more tasks. 
+                    This minimises thread dead time, and potentially costly mutex usage. 
+                </div>
+                <div class="text-box-element">
+                    <div class="text-box-image-box">
+                        <img class="text-box-image" style="object-fit: contain;" src="Images/ecs/WorkerThreadInternals.png"
+                            alt="The function to run the worker thread">
+                        </img>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
