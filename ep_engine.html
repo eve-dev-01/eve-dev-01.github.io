@@ -4,63 +4,39 @@
         <meta charset="UTF-8">
 		<title>EP Engine</title>
 		<link href="Styles/MainPage.css" rel="stylesheet" type="text/css"></link>
-		<meta name="description" content="My portfolio! Come see my work, especially the multi-platform renderer!">
+		<link href="Styles/ProjectPage.css" rel="stylesheet" type="text/css"></link>
+        <link href="Styles/NavBar.css" rel="stylesheet" type="text/css"></link>
+        <meta name="description" content="My portfolio! Come see my work, especially the multi-platform renderer!">
 		<meta name="keywords" content="computer,science,games,development,portfolio">
 		<meta name="author" content="Eve Powell">
-    
-        <style>
-            .text-box {
-                margin-left: 10px;
-                margin-right: 10px;
-                margin-bottom: 10px;
-                padding:10px;
-                border:2px solid aqua;
-                border-radius: 5px;
-            
-                font-size:15pt;
-                min-height:150px;
-                min-width: 500px;
-                
-                width:30%;
-                
-                display:flex;
-                flex-wrap: wrap;       
-                flex-direction: row;
-                flex-grow:1;
-                justify-content: center;      
-            }
-            .text-box-element {
-                padding-bottom: 10px;
-            }
-            .text-box-contents {
-                min-width: 300px;
-                margin-top: 10px auto;
-                margin-bottom: 10px auto;
-            }
-            .text-box-image-box {  
-                overflow:hidden;
-                object-fit: cover;
-                border-radius: 5px;
-                width:100%;   
-                justify-content: center;
-                display: flex;
-            }
-            .text-box-image {
-                width:90%;             
-                object-fit:cover;
-                flex:1;
-            }
-            .text-boxes-container {
-                display:flex;
-                flex-wrap: wrap;    
-                flex-direction: row;
-                justify-content: stretch;
-            }
-        </style>
     </head>
 
 
     <body style="color:lightgrey">
+        <header>
+			<div id="nav-bar-container">
+				<div id="nav-bar">
+					<span style="justify-self: left;">
+						Eve Powell: Portfolio
+					</span>
+					<div id="nav-bar-options">
+						<span class="nav-bar-option">
+							<a class="nav-bar-link" href="index.html">Home</a>
+						</span>
+						<span class="nav-bar-option">
+							<a class="nav-bar-link" href="ep_engine.html">EP Engine</a>
+						</span>
+						<span class="nav-bar-option">
+							<a class="nav-bar-link" href="triage_story.html">Triage Story</a>
+						</span>
+					</span>
+				</div>
+			</div>
+		</header>
+		<br>
+		<br>
+
+
         <div class="text-boxes-container">
             <div class="text-box">
                 <div class="text-box-element">

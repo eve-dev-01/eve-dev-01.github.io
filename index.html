@@ -4,12 +4,35 @@
 		<meta charset="UTF-8">
 		<title>Eve : A Top Heavy Portfolio</title>
 		<link href="Styles/MainPage.css" rel="stylesheet" type="text/css"></link>
+		<link href="Styles/NavBar.css" rel="stylesheet" type="text/css"></link>
 		<meta name="description" content="My portfolio! Come see my work, especially the multi-platform renderer!">
 		<meta name="keywords" content="computer,science,games,development,portfolio">
 		<meta name="author" content="Eve Powell">
 	</head>
 	
 	<body>
+		<header>
+			<div id="nav-bar-container">
+				<div id="nav-bar">
+					<span style="justify-self: left;">
+						Eve Powell: Portfolio
+					</span>
+					<div id="nav-bar-options">
+						<span class="nav-bar-option">
+							<a class="nav-bar-link" href="index.html">Home</a>
+						</span>
+						<span class="nav-bar-option">
+							<a class="nav-bar-link" href="ep_engine.html">EP Engine</a>
+						</span>
+						<span class="nav-bar-option">
+							<a class="nav-bar-link" href="triage_story.html">Triage Story</a>
+						</span>
+					</span>
+				</div>
+			</div>
+		</header>
+		<br>
+		<br>
 
 		<div class ="flex-container">
 			<!-- Element to link towards the multiplatform renderer -->
@@ -54,7 +77,9 @@
 			<div class="flex-element">
 				<!-- Element to hold the game image -->
 				<div class ="flex-element-fill">
-					<img class="flex-element-fill-img" src="Images/homepage/TriageStoryHeader.png" alt=""/>
+					<a href="triage_story.html" >
+						<img class="flex-element-fill-img" src="Images/homepage/TriageStoryHeader.png" alt=""/>
+					</a>
 				</div>
 
 				<!-- A box containing tags describing the project -->

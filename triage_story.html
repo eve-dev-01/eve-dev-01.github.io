@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html style="background-color:black;">
+    <head>
+        <meta charset="UTF-8">
+		<title>EP Engine</title>
+		<link href="Styles/MainPage.css" rel="stylesheet" type="text/css"></link>
+		<link href="Styles/ProjectPage.css" rel="stylesheet" type="text/css"></link>
+        <link href="Styles/NavBar.css" rel="stylesheet" type="text/css"></link>
+        <meta name="description" content="My portfolio! Come see my work, especially the multi-platform renderer!">
+		<meta name="keywords" content="computer,science,games,development,portfolio">
+		<meta name="author" content="Eve Powell">
+    </head>
+
+
+    <body style="color:lightgrey">
+		<header>
+			<div id="nav-bar-container">
+				<div id="nav-bar">
+					<span style="justify-self: left;">
+						Eve Powell: Portfolio
+					</span>
+					<div id="nav-bar-options">
+						<span class="nav-bar-option">
+							<a class="nav-bar-link" href="index.html">Home</a>
+						</span>
+						<span class="nav-bar-option">
+							<a class="nav-bar-link" href="ep_engine.html">EP Engine</a>
+						</span>
+						<span class="nav-bar-option">
+							<a class="nav-bar-link" href="triage_story.html">Triage Story</a>
+						</span>
+					</span>
+				</div>
+			</div>
+		</header>
+		<br>
+		<br>
+
+
+        <div class="text-boxes-container">
+            <div class="text-box">
+                <div class="text-box-element">
+                    <div class="text-box-contents">
+                        Triage Story is a game designed to train nurses to take mental health calls, ranging from outpatient check-ins to crisis calls with those at immediate risk. It was developed to 
+                        client specifications, ensuring we follow clinical guidance, and is being trialled as a teaching tool soon. The game was developed by a 2 person team, of which I was the lead, 
+                        so I was responsible for setting tasks and managing milestone deadlines, as well as contacting the client. I will only describe here that which I had a part in.
+                    </div>
+                </div>
+                <div class="text-box-element">
+                    <div class="text-box-image-box">
+                        <img class="text-box-image" src="Images/triage_story/LevelSelect.png" alt="A view of the level select">
+                        </img>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="text-box">
+                <div class="text-box-element">
+                    <div class="text-box-image-box">
+                        <img class="text-box-image" src="Images/triage_story/Computer.png" alt="A screen showing a text choice">
+                        </img>
+                    </div>
+                </div>
+                <div class="text-box-contents">
+                    The game features 3 levels developed from amalgamations of real calls, provided to us by the client. From here, my colleague and I developed dialogue trees; the player is simply shown a computer screen with choices representing their possible replies. 
+                    All of the patient lines are voice acted, and will play as the line is displayed; for one level this was over 170 separate voice lines!                          
+                </div>
+            </div>
+            <br>
+            <div class="text-box">
+                <div class="text-box-contents">
+                    The dialogue itself runs from the Yarn system, which can be found <b><a href="https://yarnspinner.dev/" style="color:white">here.</a></b> This is used to connect voice line assets to the appropriate text, and provides support for in-script variables. As the Triage Story scripts 
+                    use only a subset of Yarn features, and we have set expectations on the usage of the system, we developed a script editor program, which can save and load scripts, as well as export them to Yarn files that can be put right into the game.  
+                </div>
+                <div class="text-box-element">
+                    <div class="text-box-image-box">
+                        <img class="text-box-image" style="object-fit: contain;" src="Images/triage_story/ScriptEditor.png"
+                            alt="A sample usage of the script editor program">
+                        </img>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="text-box">
+                <div class="text-box-element">
+                    <div class="text-box-image-box">
+                        <img class="text-box-image" style="object-fit: contain;" src="Images/triage_story/ScriptScores.png"
+                            alt="An example of the scoring structure setup in the script">
+                        </img>
+                    </div>
+                </div>
+                <div class="text-box-contents">
+                    With a primary goal of the game being to educate through the gameplay, we need scoring systems that reflect the clinical goals of the situation. As such we have scores calculated from two sources; both where the conversation ends up, and from the in-script variables. We have extended the Yarn system 
+                    to support specific score functions, which are declared at the top of the script and are evaluated at the end of the game. This would be in the format, for example, "rudeness &lt; 2". This would then give a point if the condition is met based on how the conversation went. This allows us to appraise not only the broad 
+                    strokes of a players choices, but also some of the subtleties. Based on the score achieved, a medal grade is calculated, from bronze, silver or gold. 
+                </div>
+                <div class="text-box-element">
+                    <div class="text-box-image-box">
+                        <img class="text-box-image" style="object-fit: contain;" src="Images/triage_story/Medals.png"
+                            alt="A player's achieved medals">
+                        </img>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="text-box">
+                <div class="text-box-contents">
+                    One of the game's best strengths is its web integration. Users are required to have an account before accessing the game; they can simply create one through the home page. This is because Triage Story logs 
+                    player choices and achievements so that they can be reviewed at a later date. If a user were to play a given level 3 times, we can reconstruct a full transcript of that level from the data we have stored. At the end of the game, they can request an email transcript of their progress.
+                </div>
+                <div class="text-box-element">
+                    <div class="text-box-image-box">
+                        <img class="text-box-image" style="object-fit: contain;" src="Images/triage_story/LoginScreen.png"
+                            alt="Scratch allocation system internals">
+                        </img>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="text-box">
+                <div class="text-box-contents">
+                    Alternatively, their past efforts can be viewed through the educator portal. Students can enter a unique code within the game to join a "cohort", with each cohort being linked to an educator account. An educator can 
+                    view the data of the students that have signed up to the cohort, allowing them to sit down and talk about the evolution of a players choices over time. It may be clear that between the first and third time playing, a student has 
+                    become notably more empathetic in their chosen replies, and having that data available to the educator enables those observations and the resulting conversations.     
+                </div>
+                <div class="text-box-element">
+                    <div class="text-box-image-box">
+                        <img class="text-box-image" style="object-fit: contain;" src="Images/triage_story/EducatorView.png"
+                            alt="The educator view, for looking at transcripts">
+                        </img>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="text-box">
+                <div class="text-box-element">
+                    <div class="text-box-image-box">
+                        <img class="text-box-image" style="object-fit: contain;" src="Images/triage_story/WebRequest.png"
+                            alt="An example web method, to demonstrate how web requests are structured">
+                        </img>
+                    </div>
+                </div>
+                <div class="text-box-contents">
+                    We achieve this with Azure Web Services; through this we host an Azure DB (managed with Code First Migrations) with a C# ASMX WebService interface. We use Unity's WebRequests to send secure requests to the services, which will then interact with the database. <br>
+                    We also had to link a Gmail account to the web service so that we can send transcript and confirmation emails to users. These emails also required some basic JavaScript, with a little bit of AJAX. There were also a couple of instances of having to write raw SQL.       
+                </div>
+            </div>
+            <br>
+            <div class="text-box">
+                <div class="text-box-contents">
+                    Triage Story has been a great project in terms of personal development; as someone who usually chooses not to engage with languages outside of C++, 
+                    this was a great fresh challenge, touching a lot of technologies that I wouldn't have otherwise used. Working to client specifications, while also having the responsibility of 
+                    making design decisions for the team was also new, but welcome.<br>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
