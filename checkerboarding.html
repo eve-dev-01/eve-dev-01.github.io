@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html style="background-color:black;">
+    <head>
+        <meta charset="UTF-8">
+		<title>EP Engine</title>
+		<link href="Styles/MainPage.css" rel="stylesheet" type="text/css"></link>
+		<link href="Styles/ProjectPage.css" rel="stylesheet" type="text/css"></link>
+        <link href="Styles/NavBar.css" rel="stylesheet" type="text/css"></link>
+        <meta name="description" content="My portfolio! Come see my work, especially the multi-platform renderer!">
+		<meta name="keywords" content="computer,science,games,development,portfolio">
+		<meta name="author" content="Eve Powell">
+    </head>
+
+
+    <body style="color:lightgrey">
+        <header>
+			<div id="nav-bar-container">
+				<div id="nav-bar">
+					<span style="justify-self: left;">
+						Eve Powell: Portfolio
+					</span>
+					<div id="nav-bar-options">
+						<span class="nav-bar-option">
+							<a class="nav-bar-link" href="index.html">Home</a>
+						</span>
+						<span class="nav-bar-option">
+							<a class="nav-bar-link" href="ep_engine.html">EP Engine</a>
+						</span>
+						<span class="nav-bar-option">
+							<a class="nav-bar-link" href="triage_story.html">Triage Story</a>
+						</span>
+					</span>
+				</div>
+			</div>
+		</header>
+		<br>
+		<br>
+
+
+        <div class="text-boxes-container">
+            <div class="text-box">
+                <div class="text-box-element">
+                    <div class="text-box-contents">
+                        This page is a breakdown of my dissertation research so far! It's not complete, its still ongoing, but I think really worth a look. 
+                        <br>
+                        "Checkerboarded rendering" refers to a family of upsampling techniques that use a reduced size render-target, in conjuction with the previous full-frame render result to construct a new frame image from partially complete data.      
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="text-box">
+                <div class="text-box-contents">
+                    The core of the technique is that alternating 2x2 regions render every frame, with the rendered region flipping. Imagining the final presented image as a checkerboard, on one frame only the black squares would be truly rendered; on the next frame only the white. <br>
+                    The image shows a sample of the starting depth buffer, with each red and black square representing a 2x2 pixel region. 
+                </div>
+            </div>
+            <br>
+            <div class="text-box">
+                <div class="text-box-contents">
+                    While many techniques use a quarter sized render target (half width, half height) with an offset viewport to achieve this, I use an alternate approach, which is a depth-prepass of sorts. We simply render the 2x2 black or white squares, at a set depth of 0, meaning nothing will ever pass their depth test. 
+                </div>
+                <div class="text-box-element">
+                    <div class="text-box-image-box">
+                        <img class="text-box-image" style="object-fit: contain;" src="Images/check/DepthPre.png"
+                            alt="Alternating red and black squares representing the depth pass results.">
+                        </img>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="text-box">
+                <div class="text-box-contents">
+                    We also complete a motion pass; for each object, we provide its current object matrix, and the current view matrix, as well as what they were last frame. From this, we can calculate a difference in screen space, for a given pixel between frames.       
+                    <br> 
+                    The image provided is a representation but is not to be fully trusted; the vectors are so small due to the high frame rate that they don't show in a float format, PIX will only show them in integer formats, so these would be of a much smaller magnitude than suggested. This is solely for visualisation. 
+                </div>
+                <div class="text-box-element">
+                    <div class="text-box-image-box">
+                        <img class="text-box-image" style="object-fit: contain;" src="Images/check/MotionBuffer.png"
+                            alt="A visualisation of the motion buffer">
+                        </img>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="text-box">
+                <div class="text-box-contents">
+                    Then comes the final composition step; we take our half-rendering, our motion buffer and the final output of the last frame. We then, for each pixel that was not rendered, we sample the motion buffer, trace back along the stored vector, and sample the end of frame buffer at that position.     
+                </div>
+                <div class="text-box-element">
+                    <div class="text-box-image-box">
+                        <img class="text-box-image" style="object-fit: contain;" src="Images/check/MotionVectorDemo.png"
+                            alt="A demonstration of motion buffer sampling">
+                        </img>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="text-box">
+                <div class="text-box-element">
+                    <div class="text-box-image-box">
+                        <img class="text-box-image" style="object-fit: contain;" src="Images/check/MidReconstitution.png"
+                            alt="The frame midway through reconstruction">
+                        </img>
+                    </div>
+                </div>
+                <div class="text-box-contents">
+                    In most cases this will find the truly rendered colour of that pixel from last frame; however in rare instances we'll get bad samples, so we clamp the found colour between its two truly rendered neighbours, as a final measure. 
+                    <br> You can see here part of the screen mid re-construction; its all handled in compute shaders, with no resource contention. You may notice some of the artefacting in this picture; this is the tradeoff for speed, and is to be the subject of future improvements.
+                </div>
+            </div>
+            <br>
+            <div class="text-box">
+                <div class="text-box-contents">
+                    This is the current state of the implementation; there is a small amount of artefacting visible, but it remains to be seen how much of an impact this will have on percieved quality.<br>
+                    The current thrust of work is implementing adaptive strategies; using the motion buffer, we can calculate a reshading confidence value, where we can force reshades of areas likely to see artefacts, or more hopefully, delay shading 
+                    for more than a single frame if it appears safe. Previous research has suggested this could be the case.     
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
