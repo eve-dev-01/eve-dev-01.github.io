@@ -2,7 +2,7 @@
 <html style="background-color:black;">
     <head>
         <meta charset="UTF-8">
-		<title>Adaptive Checkerboarding</title>
+		<title>Checkerboarding</title>
 		<link href="Styles/MainPage.css" rel="stylesheet" type="text/css"></link>
 		<link href="Styles/ProjectPage.css" rel="stylesheet" type="text/css"></link>
         <link href="Styles/NavBar.css" rel="stylesheet" type="text/css"></link>
@@ -41,8 +41,8 @@
             <div class="text-box">
                 <div class="text-box-element">
                     <div class="text-box-contents">
-                        This page is a breakdown of my dissertation research so far! It's not complete, its still ongoing, but I think really worth a look. 
-                        <br>
+                        This page is a breakdown of my dissertation research! It's taken me deeper into rendering technology than anything before, and has been a great learning experience. 
+                        <br><br>
                         "Checkerboarded rendering" refers to a family of upsampling techniques that use a reduced size render-target, in conjuction with the previous full-frame render result to construct a new frame image from partially complete data.      
                     </div>
                 </div>
@@ -50,7 +50,8 @@
             <br>
             <div class="text-box">
                 <div class="text-box-contents">
-                    The core of the technique is that alternating 2x2 regions render every frame, with the rendered region flipping. Imagining the final presented image as a checkerboard, on one frame only the black squares would be truly rendered; on the next frame only the white. <br>
+                    The core of the technique is that alternating regions render in full detail every frame, with the rendered region flipping. Imagining the final presented image as a checkerboard, on one frame only the black squares would be truly rendered; on the next frame only the white.
+					The rest of the output is inferred or reconstructed from other availalbe information.<br>
                 </div>
                 <div class="text-box-element">
                     <div class="text-box-image-box">
@@ -63,8 +64,9 @@
             <br>
             <div class="text-box">
                 <div class="text-box-contents">
-                    While many techniques use a quarter sized render target (half width, half height) with an offset viewport to achieve this, I use an alternate approach, which is a depth-prepass of sorts. We simply render the 2x2 black or white squares, at a set depth of 0, meaning nothing will ever pass their depth test. 
-                    <br>
+                    While many techniques use a compressed size render target (e.g. half width) with an offset viewport to achieve this, I use an alternate approach, which is a depth-prepass of sorts. We simply render the 2x2 black or white squares, at a set depth of 0, meaning nothing will ever pass their depth test. 
+                    This is known as stencil- or depth-based checkerboarding.
+					<br>
                     The image shows a sample of the starting depth buffer, with each red and black square representing a 2x2 pixel region. 
                 </div>
                 <div class="text-box-element">
@@ -93,7 +95,10 @@
             <br>
             <div class="text-box">
                 <div class="text-box-contents">
-                    Then comes the final composition step; we take our half-rendering, our motion buffer and the final output of the last frame. We then, for each pixel that was not rendered, we sample the motion buffer, trace back along the stored vector, and sample the end of frame buffer at that position.     
+					Taking the motion for this frame and last frame, the depth for both frames, and the true renders for both frames, reconstruction can begin. It is a multi-step process, 
+					based somewhat on Ubisoft's implementation for Rainbox Six | Siege.
+					<br>
+					The motion buffer is traced back to find a 'reprojected' colour, an estimate of what the colour should be based on the previous frame's true render.
                 </div>
                 <div class="text-box-element">
                     <div class="text-box-image-box">
@@ -104,25 +109,55 @@
                 </div>
             </div>
             <br>
-            <div class="text-box">
+			<div class="text-box">
+                <div class="text-box-contents">
+					Motion reprojection is not perfect; putting too much trust in it can lead to ugly colours or ghosting. Ghosting occurs motion is only drawn at the position an object is in the current frame. 
+					<br><br>In the diagram, the orange region shows where motion is correctly rendered, outside is bad data. Sampling that outside edge may give a motion of zero, reprojecting to the object that has not moved away, giving ghosted edges.
+					<br><br>As such, motion reprojection is only employed if motion in one frame is seen to be similar to motion in the same region in the previous frame.
+                </div>
                 <div class="text-box-element">
                     <div class="text-box-image-box">
-                        <img class="text-box-image" style="object-fit: contain;" src="Images/check/MidReconstitution.png"
-                            alt="The frame midway through reconstruction">
+                        <img class="text-box-image" style="object-fit: contain;" src="Images/check/MotionCoherency.png"
+                            alt="A demonstration of motion buffer incoherency">
                         </img>
                     </div>
-                </div>
-                <div class="text-box-contents">
-                    In most cases this will find the truly rendered colour of that pixel from last frame; however in rare instances we'll get bad samples, so we clamp the found colour between its two truly rendered neighbours, as a final measure. 
-                    <br> You can see here part of the screen mid re-construction; its all handled in compute shaders, with no resource contention. You may notice some of the artefacting in this picture; this is the tradeoff for speed, and is to be the subject of future improvements.
                 </div>
             </div>
             <br>
             <div class="text-box">
+                <div class="text-box-element">
+                    <div class="text-box-image-box">
+                        <img class="text-box-image" style="object-fit: contain;" src="Images/check/DepthCoherency.png"
+                            alt="The process for depth coherent colour blending">
+                        </img>
+                    </div>
+                </div>
                 <div class="text-box-contents">
-                    This is the current state of the implementation; there is a small amount of artefacting visible, but it remains to be seen how much of an impact this will have on percieved quality.<br>
-                    The current thrust of work is implementing adaptive strategies; using the motion buffer, we can calculate a reshading confidence value, where we can force reshades of areas likely to see artefacts, or more hopefully, delay shading 
-                    for more than a single frame if it appears safe. Previous research has suggested this could be the case.     
+					Motion reprojection is often unreliable. Objects move in front of others, and may obscure otherwise good reprojections. As such, we also check for coherency in depth. 
+					Clamping against the neighbour pixels, we get an ideally safer reprojection. Then, based on depth similarity between the reprojection and this frame, we can blend back towards the true reprojected value.
+			    </div>
+            </div>
+            <br>
+			<div class="text-box">
+                <div class="text-box-element">
+                    <div class="text-box-image-box">
+                        <img class="text-box-image" style="object-fit: contain;" src="Images/check/ConditionalClamp.png"
+                            alt="The results of conditional clamping">
+                        </img>
+                    </div>
+                </div>
+                <div class="text-box-contents">
+					This processing is only completed on pixels that have some motion. Pixels with zero motion are assumed to have perfect reprojection.The image attached shows the effects of making colour clamping conditional on motion magnitude.
+					<br>In the top row, all samples are clamped, leading to differences between frames; this creates a really nasty flickering effect. <br>
+					On the bottom row, the samples are clamped only if the motion is of sufficient magnitude; these are much more stable.
+				</div>
+            </div>
+            <br>
+            <div class="text-box">
+                <div class="text-box-contents">
+                    The whole dissertaion can be found attached here. This work was graded at 89%. 
+					<br><br>
+					<u><a href="Documentation/Eve_Powell_Dissertation.pdf" style="color:white;">Eve's Dissertation</a></u>
                 </div>
             </div>
         </div>
